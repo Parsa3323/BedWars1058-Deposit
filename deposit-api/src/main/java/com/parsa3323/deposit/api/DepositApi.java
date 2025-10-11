@@ -1,12 +1,9 @@
-package me.parsa.depositapi;
+package com.parsa3323.deposit.api;
 
 
-import me.parsa.depositapi.Types.DepositType;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 

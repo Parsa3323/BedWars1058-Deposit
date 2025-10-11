@@ -1,14 +1,14 @@
-package me.parsa.depositplugin;
+package com.parsa3323.deposit;
 
 import com.andrei1058.bedwars.api.BedWars;
-import me.parsa.depositapi.DepositApi;
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.Listeners.EnderChestClick;
-import me.parsa.depositplugin.Listeners.GameStartListener;
-import me.parsa.depositplugin.Listeners.PlayerDeathListener;
-import me.parsa.depositplugin.Listeners.PlayerJoin;
+import com.parsa3323.deposit.api.DepositApi;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.Configs.MessagesConfig;
+import com.parsa3323.deposit.Listeners.EnderChestClick;
+import com.parsa3323.deposit.Listeners.GameStartListener;
+import com.parsa3323.deposit.Listeners.PlayerDeathListener;
+import com.parsa3323.deposit.Listeners.PlayerJoin;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,10 +45,16 @@ public final class DepositPlugin extends JavaPlugin {
         String version = packageName.split("\\.")[3];
 
 
-        ArenasConfig.setup();
+        ArenasConfig.init();
         ArenasConfig.get().options().copyDefaults(true);
         ArenasConfig.save();
         File configFile = new File(bedWars.getAddonsPath(), "Deposit/config.yml");
+
+        MessagesConfig.init();
+        MessagesConfig.get().options().copyDefaults(true);
+        MessagesConfig.get().addDefault("player_deposit_chest", "&7You deposited x%amount% %color%%material% to the &bTeamChest");
+        MessagesConfig.get().addDefault("player_deposit_ender_chest", "&7You deposited x%amount% %color%%material% to the &dEnderChest");
+        MessagesConfig.save();
 
         if (!configFile.exists()) {
             createConfigWithComments(configFile);

@@ -1,4 +1,4 @@
-package me.parsa.depositapi.Types;
+package com.parsa3323.deposit.api.Types;
 
 public enum DepositType {
 

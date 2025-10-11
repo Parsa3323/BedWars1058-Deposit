@@ -1,8 +1,8 @@
-package me.parsa.depositplugin.Listeners;
+package com.parsa3323.deposit.Listeners;
 
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.DepositPlugin;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.DepositPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

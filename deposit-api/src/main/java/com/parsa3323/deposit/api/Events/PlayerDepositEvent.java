@@ -1,6 +1,6 @@
-package me.parsa.depositapi.Events;
+package com.parsa3323.deposit.api.Events;
 
-import me.parsa.depositapi.Types.DepositType;
+import com.parsa3323.deposit.api.Types.DepositType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

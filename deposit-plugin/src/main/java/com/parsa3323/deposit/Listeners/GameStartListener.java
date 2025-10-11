@@ -1,11 +1,11 @@
-package me.parsa.depositplugin.Listeners;
+package com.parsa3323.deposit.Listeners;
 
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent;
 import com.andrei1058.bedwars.api.events.gameplay.TeamAssignEvent;
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.DepositPlugin;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.DepositPlugin;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;

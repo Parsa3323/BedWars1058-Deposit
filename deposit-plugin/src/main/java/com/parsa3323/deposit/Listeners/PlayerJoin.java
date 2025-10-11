@@ -1,7 +1,7 @@
-package me.parsa.depositplugin.Listeners;
+package com.parsa3323.deposit.Listeners;
 
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.DepositPlugin;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.DepositPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

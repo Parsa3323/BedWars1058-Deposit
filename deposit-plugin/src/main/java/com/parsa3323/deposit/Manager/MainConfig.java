@@ -1,7 +1,7 @@
-package me.parsa.depositplugin.Manager;
+package com.parsa3323.deposit.Manager;
 
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.DepositPlugin;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.DepositPlugin;
 import org.bukkit.World;
 
 import java.util.List;

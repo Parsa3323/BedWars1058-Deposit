@@ -82,14 +82,14 @@
         <dependency>
             <groupId>me.parsa</groupId>
             <artifactId>deposit-api</artifactId>
-            <version>1.5.2</version>
+            <version>1.5.4</version>
         </dependency>
         <dependency>
             <groupId>com.andrei1058.bedwars</groupId>
             <artifactId>bedwars-plugin</artifactId>
             <version>24.9</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/BedWars1058 (2) (2).jar</systemPath>
+            <systemPath>${project.basedir}/libs/bedwars-plugin-25.2 (1).jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>

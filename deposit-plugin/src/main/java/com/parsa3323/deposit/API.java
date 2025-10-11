@@ -1,9 +1,9 @@
-package me.parsa.depositplugin;
+package com.parsa3323.deposit;
 
-import me.parsa.depositapi.DepositApi;
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.Listeners.GameStartListener;
-import me.parsa.depositplugin.Manager.MainConfig;
+import com.parsa3323.deposit.api.DepositApi;
+import com.parsa3323.deposit.Configs.ArenasConfig;
+import com.parsa3323.deposit.Listeners.GameStartListener;
+import com.parsa3323.deposit.Manager.MainConfig;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -40,7 +40,7 @@ public class API implements DepositApi {
         @Override
         public void deleteHolograms(Player player) {
             GameStartListener gameStartListener = new GameStartListener(DepositPlugin.plugin, ArenasConfig.get());
-            DepositPlugin.debug("Trying to delete hd for " + player.getName());
+            DepositPlugin.debug("Trying to delete hologram for " + player.getName());
             gameStartListener.deleteHolograms(player);
         }
     };

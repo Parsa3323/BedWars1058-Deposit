@@ -1,20 +1,19 @@
-package me.parsa.depositplugin.Configs;
+package com.parsa3323.deposit.Configs;
 
-import me.parsa.depositplugin.DepositPlugin;
-import org.bukkit.Bukkit;
+import com.parsa3323.deposit.DepositPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ArenasConfig {
+public class MessagesConfig {
     private static File file;
 
     private static FileConfiguration fileConfiguration;
 
-    public static void setup() {
-        file = new File(DepositPlugin.bedWars.getAddonsPath(), "chestLocations.yml");
+    public static void init() {
+        file = new File(DepositPlugin.bedWars.getAddonsPath(), "Deposit/messages.yml");
 
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
