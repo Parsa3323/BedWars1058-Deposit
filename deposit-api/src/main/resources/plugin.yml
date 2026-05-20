@@ -1,3 +1,0 @@
-name: bedwars1058-deposit
-version: '${project.version}'
-main: me.parsa.depositplugin.DepositPlugin

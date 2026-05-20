@@ -1,7 +1,7 @@
 name: BedWars1058-Deposit
 version: '${project.version}'
-main: me.parsa.depositplugin.DepositPlugin
-softdepend: [BedWars1058, BedWars2023]
+main: com.parsa3323.depositplugin.DepositPlugin
+softdepend: [BedWars1058]
 permissions:
   deposit.admin:
     default: op

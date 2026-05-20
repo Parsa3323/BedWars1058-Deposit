@@ -19,15 +19,6 @@
 # Default is INFO. Change only if needed for debugging purposes.
 log-level: INFO
 
-
-# ──────────────────────────────────────────────────────────────
-
-# DISABLE HOLOGRAM AFTER DEATH:
-# If enabled (true), the deposit hologram will be removed after the player dies.
-#  ̶T̶h̶i̶s̶ ̶f̶e̶a̶t̶u̶r̶e̶ ̶i̶s̶ ̶c̶u̶r̶r̶e̶n̶t̶l̶y̶ ̶n̶o̶t̶ ̶a̶c̶t̶i̶v̶e̶ ̶b̶u̶t̶ ̶w̶i̶l̶l̶ ̶b̶e̶ ̶a̶v̶a̶i̶l̶a̶b̶l̶e̶ ̶i̶n̶ ̶a̶ ̶f̶u̶t̶u̶r̶e̶ ̶u̶p̶d̶a̶t̶e̶.̶
-#  ̶D̶o̶ ̶N̶O̶T̶ ̶c̶h̶a̶n̶g̶e̶ ̶t̶h̶i̶s̶ ̶s̶e̶t̶t̶i̶n̶g̶ ̶u̶n̶l̶e̶s̶s̶ ̶e̶x̶p̶l̶i̶c̶i̶t̶l̶y̶ ̶i̶n̶s̶t̶r̶u̶c̶t̶e̶d̶ ̶b̶y̶ ̶t̶h̶e̶ ̶d̶e̶v̶e̶l̶o̶p̶e̶r̶
-disable-hologram-after-death: false
-
 # ──────────────────────────────────────────────────────────────
 
 # HOLOGRAM REGISTER EVENT:

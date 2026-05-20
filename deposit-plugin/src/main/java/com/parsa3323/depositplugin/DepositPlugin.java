@@ -1,15 +1,33 @@
-package me.parsa.depositplugin;
+/*
+ * Copyright (C)  2026 BedWars1058-Deposit, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.parsa3323.depositplugin;
 
 import com.andrei1058.bedwars.api.BedWars;
-import me.parsa.depositapi.DepositApi;
-import me.parsa.depositplugin.Configs.ArenasConfig;
-import me.parsa.depositplugin.Listeners.EnderChestClick;
-import me.parsa.depositplugin.Listeners.GameStartListener;
-import me.parsa.depositplugin.Listeners.PlayerDeathListener;
-import me.parsa.depositplugin.Listeners.PlayerJoin;
+import com.parsa3323.depositapi.DepositApi;
+import com.parsa3323.depositplugin.Configs.ArenaConfig;
+import com.parsa3323.depositplugin.Listeners.ChestClickListener;
+import com.parsa3323.depositplugin.Listeners.DepositListener;
+import com.parsa3323.depositplugin.Listeners.GameStartListener;
+import com.parsa3323.depositplugin.Listeners.PlayerJoinListener;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,31 +41,35 @@ public final class DepositPlugin extends JavaPlugin {
     private static Logger logger;
     public static Level logLevel;
     public YamlConfiguration configuration;
-    public static DepositApi api;
 
+    public static DepositApi api;
     public static DepositPlugin plugin;
     public static BedWars bedWars;
 
     @Override
     public void onEnable() {
         logger = getLogger();
-        api= new API();
-        plugin = this;
+        getLogger().info("Loading " + getDescription().getName() + " v" + getDescription().getVersion());
+
+        status("BedWars1058 - Deposit by Parsa3323");
+
+
+        status("Hooking into BedWars1058...");
+
+        if (Bukkit.getPluginManager().getPlugin("BedWars1058") == null) {
+            getLogger().severe("BedWars1058 was not found. Disabling...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         bedWars = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
-        getServer().getServicesManager().register(DepositApi.class, api, this, ServicePriority.Normal);
-
-        status("Enabling plugin");
-        status("Loading version v" + getDescription().getVersion());
-        status("BedWars1058 - Deposit by Parsa3323");
-        status("Loading configs");
-        String packageName = getServer().getClass().getPackage().getName();
-        String version = packageName.split("\\.")[3];
 
 
-        ArenasConfig.setup();
-        ArenasConfig.get().options().copyDefaults(true);
-        ArenasConfig.save();
+        status("Loading configs...");
+
+        ArenaConfig.setup();
+        ArenaConfig.get().options().copyDefaults(true);
+        ArenaConfig.save();
         File configFile = new File(bedWars.getAddonsPath(), "Deposit/config.yml");
 
         if (!configFile.exists()) {
@@ -56,21 +78,26 @@ public final class DepositPlugin extends JavaPlugin {
 
         configuration = YamlConfiguration.loadConfiguration(configFile);
 
-        status("Registering events");
-        status("Hooking into bw1085");
+        api = new API();
+        getServer().getServicesManager().register(DepositApi.class, api, this, ServicePriority.Normal);
 
-        if (Bukkit.getPluginManager().getPlugin("BedWars1058") == null) {
-            getLogger().severe("BedWars1058 was not found. Disabling...");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
+        plugin = this;
+
+        status("Registering events...");
+        PluginManager pm = getServer().getPluginManager();
+        Listener[] listeners = new Listener[] {
+                new ChestClickListener(),
+                new DepositListener(),
+                new GameStartListener(),
+                new PlayerJoinListener()
+        };
+
+        for (Listener listener : listeners) {
+            pm.registerEvents(listener, this);
+            getLogger().info("Loaded listener: " + listener.getClass().getSimpleName());
         }
 
-        BedWars bedwarsAPI = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
-        getServer().getPluginManager().registerEvents(new EnderChestClick(), this);
-        getServer().getPluginManager().registerEvents(new GameStartListener(this, ArenasConfig.get()), this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
-        status("Enabled plugin");
+        status("Successfully loaded plugin!");
         String levelName = getConfig().getString("log-level", "INFO").toUpperCase();
         logLevel = Level.parse(levelName);
         logger.setLevel(logLevel);
