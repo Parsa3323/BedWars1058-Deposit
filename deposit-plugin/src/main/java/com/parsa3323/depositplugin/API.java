@@ -19,6 +19,7 @@ package com.parsa3323.depositplugin;
 
 import com.parsa3323.depositapi.DepositApi;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
+import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.Listeners.GameStartListener;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import com.parsa3323.depositplugin.utils.HologramUtils;
@@ -46,7 +47,11 @@ public class API implements DepositApi {
     HologramUtil hologramUtil = new HologramUtil() {
         @Override
         public void reloadHolograms(Player player) {
-            HologramUtils.createHolograms(player);
+            World world = player.getWorld();
+            DepositUtils.setChestLocations(world);
+            if (MainConfig.get().getBoolean("deposit-holograms")) {
+                HologramUtils.spawnDepositHolograms(world);
+            }
         }
 
         @Override

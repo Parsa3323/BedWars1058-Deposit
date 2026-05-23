@@ -26,6 +26,7 @@ import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import com.parsa3323.depositplugin.utils.HologramUtils;
+import jdk.tools.jmod.Main;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -57,7 +58,10 @@ public class GameStartListener implements Listener {
             successGameState = true;
 
             DepositUtils.setChestLocations(world);
-            HologramUtils.spawnDepositHolograms(world);
+
+            if (MainConfig.get().getBoolean("deposit-holograms")) {
+                HologramUtils.spawnDepositHolograms(world);
+            }
 
             return;
         }
@@ -91,7 +95,10 @@ public class GameStartListener implements Listener {
             }
 
             DepositUtils.setChestLocations(world);
-            HologramUtils.spawnDepositHolograms(world);
+
+            if (MainConfig.get().getBoolean("deposit-holograms")) {
+                HologramUtils.spawnDepositHolograms(world);
+            }
 
             return;
         }

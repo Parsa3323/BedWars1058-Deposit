@@ -18,6 +18,7 @@
 package com.parsa3323.depositplugin.utils;
 
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
+import com.parsa3323.depositplugin.Configs.MessageConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,17 +27,27 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 
 public class HologramUtils {
-    private static final String[] HOLOGRAM_LINES = {
-            ChatColor.GRAY + "DEPOSIT.",
-            ChatColor.GRAY + "PUNCH TO"
-    };
 
-    public static void createHologram(Location chestLocation, String... lines) {
+    private static String[] getHologramLines() {
+        String raw = MessageConfig.get().getString("hologram_text");
+        if (raw == null || raw.isEmpty()) {
+            return new String[] {
+                    ChatColor.GRAY + "DEPOSIT.",
+                    ChatColor.GRAY + "PUNCH TO"
+            };
+        }
+        String[] lines = raw.split("\n");
+        return new String[] {
+                ChatColor.translateAlternateColorCodes('&', lines[1]),
+                ChatColor.translateAlternateColorCodes('&', lines[0])
+        };
+    }
+
+    public static void createCustomHologram(Location chestLocation, String... lines) {
         Location baseLocation = chestLocation.clone().add(0.5, 0.9, 0.5);
 
         for (int i = 0; i < lines.length; i++) {
@@ -86,17 +97,6 @@ public class HologramUtils {
         }
     }
 
-    public static void createHolograms(Player player) {
-        if (player == null) return;
-        World world = player.getWorld();
-        if (world == null) {
-            Bukkit.getLogger().warning("World is null for player " + player.getName());
-            return;
-        }
-        DepositPlugin.debug("Manually spawning holograms for world: " + world.getName());
-        DepositUtils.setChestLocations(world);
-        HologramUtils.spawnDepositHolograms(world);
-    }
 
     public static void deleteHologram(Location chestLocation) {
         Location baseLocation = chestLocation.clone().add(0.5, 0.9, 0.5);
@@ -117,15 +117,14 @@ public class HologramUtils {
         DepositPlugin.debug("Spawning holograms for " + chestLocations.size() + " chests in world: " + world.getName());
         for (String locString : chestLocations) {
             Location chestLoc = DepositUtils.deserializeLocation(locString, world);
-            if (chestLoc == null) continue;
 
             Location baseLoc = chestLoc.clone().add(0.5, 0.9, 0.5);
-            for (int i = 0; i < HOLOGRAM_LINES.length; i++) {
+            for (int i = 0; i < getHologramLines().length; i++) {
                 Location hologramLoc = baseLoc.clone().add(0, 0.3 * i, 0);
                 ArmorStand hologram = world.spawn(hologramLoc, ArmorStand.class);
                 hologram.setVisible(false);
                 hologram.setMarker(true);
-                hologram.setCustomName(HOLOGRAM_LINES[i]);
+                hologram.setCustomName(getHologramLines()[i]);
                 hologram.setCustomNameVisible(true);
                 hologram.setGravity(false);
             }

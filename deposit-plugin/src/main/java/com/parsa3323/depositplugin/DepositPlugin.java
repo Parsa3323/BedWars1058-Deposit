@@ -21,6 +21,7 @@ import com.andrei1058.bedwars.api.BedWars;
 import com.parsa3323.depositapi.DepositApi;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
+import com.parsa3323.depositplugin.Configs.MessageConfig;
 import com.parsa3323.depositplugin.Listeners.ChestClickListener;
 import com.parsa3323.depositplugin.Listeners.DepositListener;
 import com.parsa3323.depositplugin.Listeners.GameStartListener;
@@ -69,6 +70,15 @@ public final class DepositPlugin extends JavaPlugin {
         ArenaConfig.init();
         ArenaConfig.get().options().copyDefaults(true);
         ArenaConfig.save();
+        MessageConfig.init();
+
+        MessageConfig.get().addDefault("player_deposit_chest", "&7You deposited x%amount% %color%%material% to the &bTeamChest");
+        MessageConfig.get().addDefault("player_deposit_ender_chest", "&7You deposited x%amount% %color%%material% to the &dEnderChest");
+        MessageConfig.get().addDefault("hologram_text", "&7PUNCH TO\n&7DEPOSIT.");
+
+
+        MessageConfig.get().options().copyDefaults(true);
+        MessageConfig.save();
         MainConfig.init();
 
         api = new API();

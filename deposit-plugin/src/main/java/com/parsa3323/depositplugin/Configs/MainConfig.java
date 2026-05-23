@@ -60,6 +60,9 @@ public class MainConfig {
                 configContent.append("# Determines when the deposit hologram should be registered in the game.\n");
                 configContent.append("hologram-register-event: GameStateChangeEvent\n\n");
 
+                configContent.append("# Enable or Disable deposit holograms.\n");
+                configContent.append("deposit-holograms: true\n\n");
+
                 configContent.append("# If enabled, depositing an item will move all matching item stacks\n");
                 configContent.append("# from the player's inventory to the Ender Chest or Chest.\n");
                 configContent.append("deposit-whole-itemstack: false\n\n");

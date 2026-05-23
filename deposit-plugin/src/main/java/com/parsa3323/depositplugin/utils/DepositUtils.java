@@ -25,13 +25,11 @@ import com.parsa3323.depositapi.Events.PlayerDepositEvent;
 import com.parsa3323.depositapi.Types.DepositType;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
+import com.parsa3323.depositplugin.Configs.MessageConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -82,8 +80,14 @@ public class DepositUtils {
 
     public static void sendDepositMessage(Player p, int amount, Material material, String chestType, ChatColor color) {
         String itemName = TextUtils.formatItemName(material);
-        p.sendMessage(ChatColor.GRAY + "You deposited x" + amount + " " + color + itemName +
-                ChatColor.GRAY + " to the" + chestType);
+        String template = ChatColor.stripColor(chestType.replaceAll(" ", "")).equalsIgnoreCase("EnderChest")
+                ? MessageConfig.get().getString("player_deposit_ender_chest")
+                : MessageConfig.get().getString("player_deposit_chest");
+
+        p.sendMessage(ChatColor.translateAlternateColorCodes('&', template)
+                .replace("%amount%", String.valueOf(amount))
+                .replace("%color%", String.valueOf(color))
+                .replace("%material%", itemName));
         p.playSound(p.getLocation(), XSound.BLOCK_CHEST_CLOSE.parseSound(), 1.0f, 1.0f);
     }
 
@@ -137,7 +141,7 @@ public class DepositUtils {
 
             String hologramText = CHEST_HOLOGRAM_TEXTS.get(block.getType().name());
             if (hologramText != null) {
-                HologramUtils.createHologram(block.getLocation(), hologramText);
+                HologramUtils.createCustomHologram(block.getLocation(), hologramText);
             }
         } else {
             p.sendMessage(ChatColor.YELLOW + "This chest is already set!");

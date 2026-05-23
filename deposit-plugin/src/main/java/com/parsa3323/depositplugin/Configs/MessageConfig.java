@@ -24,13 +24,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class ArenaConfig {
+public class MessageConfig {
     private static File file;
 
     private static FileConfiguration fileConfiguration;
 
     public static void init() {
-        file = new File(DepositPlugin.bedWars.getAddonsPath(), "Deposit/data/chestlocations.yml");
+        file = new File(DepositPlugin.bedWars.getAddonsPath(), "Deposit/message.yml");
 
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
