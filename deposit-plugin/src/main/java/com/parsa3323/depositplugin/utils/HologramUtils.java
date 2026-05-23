@@ -41,10 +41,11 @@ public class HologramUtils {
             };
         }
         String[] lines = raw.split("\n");
-        return new String[] {
-                ChatColor.translateAlternateColorCodes('&', lines[1]),
-                ChatColor.translateAlternateColorCodes('&', lines[0])
-        };
+        String[] reversed = new String[lines.length];
+        for (int i = 0; i < lines.length; i++) {
+            reversed[i] = ChatColor.translateAlternateColorCodes('&', lines[lines.length - 1 - i]);
+        }
+        return reversed;
     }
 
     public static void createCustomHologram(Location chestLocation, String... lines) {
