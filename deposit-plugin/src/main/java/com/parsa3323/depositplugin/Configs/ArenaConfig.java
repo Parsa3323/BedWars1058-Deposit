@@ -30,7 +30,7 @@ public class ArenaConfig {
     private static FileConfiguration fileConfiguration;
 
     public static void init() {
-        file = new File(DepositPlugin.bedWars.getAddonsPath(), "chestLocations.yml");
+        file = new File(DepositPlugin.bedWars.getAddonsPath(), "data/chestlocations.yml");
 
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
