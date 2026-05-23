@@ -41,7 +41,7 @@ public class MainConfig {
         if (!file.exists()) {
             try {
                 StringBuilder configContent = new StringBuilder();
-                configContent.append("# BedWars1058 - Deposit addon\n");
+                configContent.append("# BedWars1058 - Deposit Addon\n");
                 configContent.append("# Github: https://github.com/Parsa3323/BedWars1058-Deposit \n\n");
 
 
