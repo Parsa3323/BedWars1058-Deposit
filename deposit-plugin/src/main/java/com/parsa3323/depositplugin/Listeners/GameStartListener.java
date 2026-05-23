@@ -22,6 +22,7 @@ import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent;
 import com.andrei1058.bedwars.api.events.gameplay.TeamAssignEvent;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
+import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import com.parsa3323.depositplugin.utils.HologramUtils;
@@ -42,7 +43,7 @@ public class GameStartListener implements Listener {
     public void onGameStart(GameStateChangeEvent event) {
         if (event.getNewState() != GameState.playing) return;
 
-        String configEvent = DepositPlugin.plugin.configuration.getString("hologram-register-event");
+        String configEvent = MainConfig.get().getString("hologram-register-event");
         IArena arena = event.getArena();
         World world = arena.getWorld();
 
@@ -64,7 +65,7 @@ public class GameStartListener implements Listener {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!successGameAssign && DepositPlugin.plugin.getConfig().getString("hologram-register-event").equalsIgnoreCase("TeamAssignEvent")) {
+                if (!successGameAssign && MainConfig.get().getString("hologram-register-event").equalsIgnoreCase("TeamAssignEvent")) {
                     event.getArena().getPlayers().forEach(player -> {
                         if (player.isOp()) {
                             player.sendMessage(ChatColor.RED + "It looks like your event for registering holograms didn't work, you can make it work with changing hologram-register-event value to GameStateChangeEvent");
@@ -77,7 +78,7 @@ public class GameStartListener implements Listener {
 
     @EventHandler
     public void onGameAssign(TeamAssignEvent event) {
-        String configuredEvent = DepositPlugin.plugin.configuration.getString("hologram-register-event");
+        String configuredEvent = MainConfig.get().getString("hologram-register-event");
         if ("TeamAssignEvent".equalsIgnoreCase(configuredEvent)) {
             DepositPlugin.debug("TeamAssignEvent triggered");
             successGameAssign = true;
@@ -100,7 +101,7 @@ public class GameStartListener implements Listener {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!successGameState && DepositPlugin.plugin.configuration.getString("hologram-register-event").equalsIgnoreCase("GameStateChangeEvent")) {
+                if (!successGameState && MainConfig.get().getString("hologram-register-event").equalsIgnoreCase("GameStateChangeEvent")) {
                     event.getArena().getPlayers().forEach(player -> {
                         if (player.isOp()) {
                             player.sendMessage(ChatColor.RED + "It looks like your event for registering holograms didn't work, you can make it work with changing hologram-register-event value to TeamAssignEvent");

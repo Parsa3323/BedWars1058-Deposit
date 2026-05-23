@@ -24,6 +24,7 @@ import com.cryptomorin.xseries.XSound;
 import com.parsa3323.depositapi.Events.PlayerDepositEvent;
 import com.parsa3323.depositapi.Types.DepositType;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
+import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -191,7 +192,7 @@ public class DepositUtils {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (DepositPlugin.plugin.configuration.getBoolean("deposit-whole-itemstack")) {
+                if (MainConfig.get().getBoolean("deposit-whole-itemstack")) {
                     DepositUtils.handleDepositWholeStack(p, itemMat, targetInventory, chestTypeName, color);
                 } else {
                     DepositUtils.handleDepositSingleStack(p, itemInHand, targetInventory, chestTypeName, color);

@@ -29,7 +29,7 @@ public class ArenaConfig {
 
     private static FileConfiguration fileConfiguration;
 
-    public static void setup() {
+    public static void init() {
         file = new File(DepositPlugin.bedWars.getAddonsPath(), "chestLocations.yml");
 
         if (!file.getParentFile().exists()) {
@@ -57,7 +57,7 @@ public class ArenaConfig {
             fileConfiguration.save(file);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Error while saving : " + e.getMessage());
+            DepositPlugin.error("Error while saving : " + e.getMessage());
         }
 
     }
