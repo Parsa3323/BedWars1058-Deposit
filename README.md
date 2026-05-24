@@ -45,71 +45,54 @@ This document contains the configuration details for BedWars1058-Deposit.
 
 ## Main Configuration
 
-The `main.yml` configuration file allows you to enable or disable debugging.
+The `config.yml` file is the plugin's main configuration file:
 
 
 </div>
 
 ```yaml
-# ──────────────────────────────────────────────────────────────
-#   Punch to deposit - By Parsa3323
-# ──────────────────────────────────────────────────────────────
-#   This configuration file controls various aspects of the addon.
-#   Make sure to read the comments carefully before changing any settings.
-# ──────────────────────────────────────────────────────────────
+# BedWars1058 - Deposit Addon
+# Github: https://github.com/Parsa3323/BedWars1058-Deposit 
 
-# LOG LEVEL:
+# Log level:
 # Determines the level of logging that will be shown in the console.
 # Available options:
-# - SEVERE   → Shows only critical errors.
-# - WARNING  → Displays warnings and serious issues.
-# - INFO     → Standard logging (recommended for most cases).
-# - CONFIG   → Shows additional configuration details.
-# - FINE     → Provides debugging information (useful for developers).
-# - FINER    → Even more detailed debugging logs.
-# - FINEST   → Maximum debugging details (may spam the console).
-# Default is INFO. Change only if needed for debugging purposes.
-log-level: FINE
+# SEVERE   - Shows only critical errors.
+# WARNING  - Displays warnings and serious issues.
+# INFO     - Standard logging (recommended).
+# CONFIG   - Shows additional configuration details.
+# FINE     - Provides debugging information (debug mode).
+# FINER    - Even more detailed debugging logs.
+# FINEST   - Maximum debugging details (may spam the console).
+log-level: INFO
 
-data-saving-method: SQLITE
-
-# ──────────────────────────────────────────────────────────────
-
-# DISABLE HOLOGRAM AFTER DEATH:
-# If enabled (true), the deposit hologram will be removed after the player dies.
-disable-hologram-after-death: false
-
-# ──────────────────────────────────────────────────────────────
-
-# HOLOGRAM REGISTER EVENT:
 # Determines when the deposit hologram should be registered in the game.
 hologram-register-event: GameStateChangeEvent
 
-# ──────────────────────────────────────────────────────────────
+# Enable or Disable deposit holograms.
+deposit-holograms: true
 
-# DEPOSIT WHOLE ITEMSTACK:
-# If enabled (true), depositing an item will move all matching item stacks
-# (same type as the item in hand) from the player's inventory to the Ender Chest.
+# If enabled, depositing an item will move all matching item stacks
+# from the player's inventory to the Ender Chest or Chest.
 deposit-whole-itemstack: false
 
-# ──────────────────────────────────────────────────────────────
-
-# SHIFT-CLICK ON CHEST TO SET:
-# If enabled (true), while in BedWars1058 setup mode,
+# If enabled, while in BedWars1058 setup mode,
 # players can shift-click on an Ender Chest or Chest to register it
 # as a valid deposit chest for holograms.
 shift-click-on-chest-to-set: true
 
-# ──────────────────────────────────────────────────────────────
-
-# SET CHEST LOCATIONS ON PLAYER JOIN:
-# If enabled (true), all chest locations will be saved when the a player joins the server.
+# If enabled, all chest locations will be saved when a player joins the server. (may lag the server for the first time)
 set-chest-locations-on-join: true
+
 
 ```
 
-
 <div align="center">
+
+
+## Messages Configuration
+
+
 
 
 
