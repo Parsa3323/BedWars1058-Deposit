@@ -41,8 +41,12 @@
 
 This contains the configuration details for BedWars1058-Deposit.
 
+</div>
+
 > [!NOTE]
 > All files are located in `/plugins/BedWars1058/Addons/Deposit`
+
+<div align="center">
 
 
 ## Main Configuration
