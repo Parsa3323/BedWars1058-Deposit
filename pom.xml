@@ -21,9 +21,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>me.parsa</groupId>
+  <groupId>com.parsa3323</groupId>
   <artifactId>Bedwars1058-Deposit</artifactId>
-  <version>1.5.4</version>
+  <version>1.26.0</version>
   <packaging>pom</packaging>
   <modules>
         <module>Deposit-Api</module>
@@ -31,7 +31,7 @@
   </modules>
 
 
-    <name>Bedwars1058-Deposit</name>
+    <name>BedWars1058-Deposit</name>
 
   <properties>
     <java.version>11</java.version>

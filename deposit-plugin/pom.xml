@@ -23,7 +23,7 @@
 
     <groupId>com.parsa3323</groupId>
     <artifactId>deposit-plugin</artifactId>
-    <version>1.5.4</version>
+    <version>1.26.0</version>
     <packaging>jar</packaging>
 
     <name>deposit-plugin</name>
@@ -97,9 +97,9 @@
             <version>3.0.2</version>
         </dependency>
         <dependency>
-            <groupId>me.parsa</groupId>
+            <groupId>com.parsa3323</groupId>
             <artifactId>deposit-api</artifactId>
-            <version>1.5.4</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.andrei1058.bedwars</groupId>

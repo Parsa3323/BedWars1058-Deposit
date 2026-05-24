@@ -26,11 +26,34 @@ import java.io.IOException;
 
 public class ArenaConfig {
     private static File file;
-
     private static FileConfiguration fileConfiguration;
 
     public static void init() {
-        file = new File(DepositPlugin.bedWars.getAddonsPath(), "Deposit/data/chestlocations.yml");
+        File addonsPath = DepositPlugin.bedWars.getAddonsPath();
+        File depositFolder = new File(addonsPath, "Deposit");
+        File oldFile = new File(depositFolder, "chestLocations.yml");
+        File newFile = new File(depositFolder, "data/chestlocations.yml");
+
+        if (oldFile.exists()) {
+            if (!newFile.getParentFile().exists()) {
+                newFile.getParentFile().mkdirs();
+            }
+
+            if (!newFile.exists()) {
+                boolean success = oldFile.renameTo(newFile);
+                if (success) {
+                    DepositPlugin.info("Migrated old chestLocations.yml to data/chestlocations.yml");
+                } else {
+                    DepositPlugin.error("Failed to migrate chestLocations.yml, moving manually may be required.");
+                }
+            } else {
+                File backup = new File(depositFolder, "chestLocations.yml.old");
+                oldFile.renameTo(backup);
+                DepositPlugin.warn("chestlocations.yml already exists. Old file backed up as chestLocations.yml.old");
+            }
+        }
+
+        file = newFile;
 
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -45,7 +68,6 @@ public class ArenaConfig {
         }
 
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
-
     }
 
     public static FileConfiguration get() {
@@ -57,13 +79,11 @@ public class ArenaConfig {
             fileConfiguration.save(file);
         } catch (IOException e) {
             e.printStackTrace();
-            DepositPlugin.error("Error while saving : " + e.getMessage());
+            DepositPlugin.error("Error while saving: " + e.getMessage());
         }
-
     }
 
-    public static void reload(){
+    public static void reload() {
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
     }
-
 }

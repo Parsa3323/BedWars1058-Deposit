@@ -106,21 +106,12 @@ public final class DepositPlugin extends JavaPlugin {
         debug("Log level set to: " + logLevel);
 
     }
-    private void createConfigWithComments(File configFile) {
-        try {
 
-            configFile.getParentFile().mkdirs();
-            if (configFile.createNewFile()) {
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     @Override
     public void onDisable() {
 
     }
+
     public static void debug(String message) {
         if (logLevel.intValue() <= Level.FINE.intValue()) {
             logger.info("[DEBUG] " + message);
