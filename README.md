@@ -2,9 +2,9 @@
 
 ![logo](.github/assets/logo.png)
 
-# Bedwars1058-Deposit
+# BedWars1058-Deposit
 
-`1.8, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.20, 1.20.6, 1.21`
+`1.8, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.20, 1.20.6, 1.21, 26.1`
 
 ![GitHub Sponsors](https://img.shields.io/github/sponsors/Parsa3323?label=Sponsor&logo=GitHub)
 ![GitHub contributors](https://img.shields.io/github/contributors/Parsa3323/BedWars1058-Deposit?label=Contributors&logo=GitHub)
@@ -14,25 +14,9 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Parsa3323/BedWars1058-Deposit?color=yellow&logo=github)
 ![GitHub license](https://img.shields.io/github/license/Parsa3323/BedWars1058-Deposit?color=purple&logo=github)
 ![Forks](https://img.shields.io/github/forks/Parsa3323/BedWars1058-Deposit?style=)
-</div>
-
-[//]: # (![Spigot Downloads]&#40;https://img.shields.io/spiget/downloads/PLUGIN_ID?color=blue&logo=spigot&#41;)
-[//]: # (![GitHub Activity Graph]&#40;https://github-readme-activity-graph.vercel.app/graph?username=Parsa3323&theme=github-dark&#41;)
-
-
-<div align="center">
-
-[//]: # ([![S]&#40;https://img.shields.io/badge/Go_to-Spigot-yellow?style=for-the-badge&#41;]&#40;https://www.spigotmc.org/resources/advancedarmorstands.121022/&#41;)
-
-[//]: # ([![S]&#40;https://img.shields.io/badge/Go_to-Wiki-orange?style=for-the-badge&#41;]&#40;https://docs.advancedarmorstands.ir/&#41;)
-
-[//]: # ([![S]&#40;https://img.shields.io/badge/Go_to-PolyMart-green?style=for-the-badge&#41;]&#40;https://www.polymart.org/product/7829/advancedarmorstands&#41;)
-
 
 [![Repo Stats](https://github-readme-stats.vercel.app/api/pin/?username=Parsa3323&repo=BedWars1058-Deposit&theme=dark)
 ](https://github.com/Parsa3323/BedWars1058-Deposit)
-
-
 
 </div>
 
@@ -48,7 +32,7 @@
 
 - [Requirements](#requirements)
 
-- [Spigot](https://www.spigotmc.org/resources/advancedarmorstands.121022/)
+- [SpigotMc Link](https://www.spigotmc.org/resources/advancedarmorstands.121022/)
 - [Configs](#Configs)
     - [Main config](#Main-Configuration)
 
@@ -136,7 +120,7 @@ set-chest-locations-on-join: true
 # Requirements
 </div>
 
-- [Bedwars1058](https://github.com/andrei1058/BedWars1058)
+- [BedWars1058](https://github.com/andrei1058/BedWars1058)
 
 <div align="center">
 
