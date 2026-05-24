@@ -23,7 +23,7 @@
 
     <groupId>com.parsa3323</groupId>
     <artifactId>deposit-api</artifactId>
-    <version>1.26.0</version>
+    <version>1.6.0</version>
     <packaging>jar</packaging>
 
     <name>deposit-api</name>
