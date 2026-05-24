@@ -53,7 +53,6 @@ public final class DepositPlugin extends JavaPlugin {
 
         status("BedWars1058 - Deposit by Parsa3323");
 
-
         status("Hooking into BedWars1058...");
 
         if (Bukkit.getPluginManager().getPlugin("BedWars1058") == null) {
@@ -75,7 +74,6 @@ public final class DepositPlugin extends JavaPlugin {
         MessageConfig.get().addDefault("player_deposit_chest", "&7You deposited x%amount% %color%%material% to the &bTeamChest");
         MessageConfig.get().addDefault("player_deposit_ender_chest", "&7You deposited x%amount% %color%%material% to the &dEnderChest");
         MessageConfig.get().addDefault("hologram_text", "&7PUNCH TO\n&7DEPOSIT.");
-
 
         MessageConfig.get().options().copyDefaults(true);
         MessageConfig.save();

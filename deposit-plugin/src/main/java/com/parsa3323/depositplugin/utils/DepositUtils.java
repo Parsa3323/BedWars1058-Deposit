@@ -78,7 +78,7 @@ public class DepositUtils {
         return location;
     }
 
-    public static void sendDepositMessage(Player p, int amount, Material material, String chestType, ChatColor color) {
+    private static void sendDepositMessage(Player p, int amount, Material material, String chestType, ChatColor color) {
         String itemName = TextUtils.formatItemName(material);
         String template = ChatColor.stripColor(chestType.replaceAll(" ", "")).equalsIgnoreCase("EnderChest")
                 ? MessageConfig.get().getString("player_deposit_ender_chest")
@@ -91,7 +91,7 @@ public class DepositUtils {
         p.playSound(p.getLocation(), XSound.BLOCK_CHEST_CLOSE.parseSound(), 1.0f, 1.0f);
     }
 
-    public static void handleDepositWholeStack(Player p, Material itemMat, Inventory targetInventory, String chestType, ChatColor color) {
+    private static void depositWholeStack(Player p, Material itemMat, Inventory targetInventory, String chestType, ChatColor color) {
         int totalCount = 0;
         List<ItemStack> itemsToRemove = new ArrayList<>();
 
@@ -112,7 +112,7 @@ public class DepositUtils {
         }
     }
 
-    public static void handleDepositSingleStack(Player p, ItemStack item, Inventory targetInventory, String chestType, ChatColor color) {
+    public static void depositSingleStack(Player p, ItemStack item, Inventory targetInventory, String chestType, ChatColor color) {
         if (item == null || item.getType() == Material.AIR) return;
 
         int amount = item.getAmount();
@@ -197,9 +197,9 @@ public class DepositUtils {
             @Override
             public void run() {
                 if (MainConfig.get().getBoolean("deposit-whole-itemstack")) {
-                    DepositUtils.handleDepositWholeStack(p, itemMat, targetInventory, chestTypeName, color);
+                    DepositUtils.depositWholeStack(p, itemMat, targetInventory, chestTypeName, color);
                 } else {
-                    DepositUtils.handleDepositSingleStack(p, itemInHand, targetInventory, chestTypeName, color);
+                    DepositUtils.depositSingleStack(p, itemInHand, targetInventory, chestTypeName, color);
                 }
             }
         }.runTaskAsynchronously(DepositPlugin.plugin);
