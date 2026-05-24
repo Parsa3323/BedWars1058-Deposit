@@ -35,6 +35,7 @@
 - [SpigotMc Link](https://www.spigotmc.org/resources/advancedarmorstands.121022/)
 - [Configs](#Configs)
     - [Main config](#Main-Configuration)
+    - [Messages Config](#Messages-Configuration)
 
 
 <div align="center">
@@ -92,11 +93,19 @@ set-chest-locations-on-join: true
 
 ## Messages Configuration
 
-
-
-
+Edit deposit messages and holograms in `messages.yml`
 
 </div>
+
+```yaml
+player_deposit_chest: '&7You deposited x%amount% %color%%material% to the &bTeamChest'
+player_deposit_ender_chest: '&7You deposited x%amount% %color%%material% to the &dEnderChest'
+hologram_text: |-
+  &7PUNCH TO
+  &7DEPOSIT.
+```
+
+
 
 <div align="center">
 
