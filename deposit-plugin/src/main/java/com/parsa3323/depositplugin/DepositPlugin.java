@@ -27,14 +27,11 @@ import com.parsa3323.depositplugin.Listeners.DepositListener;
 import com.parsa3323.depositplugin.Listeners.GameStartListener;
 import com.parsa3323.depositplugin.Listeners.PlayerJoinListener;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
