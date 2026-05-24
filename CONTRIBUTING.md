@@ -1,6 +1,6 @@
-# Contributing to Bw-Deposit
+# Contributing to BedWars1058-Deposit
 
-Thank you for considering contributing to **Bw-Deposit**! Here’s how you can help improve the project.
+Thank you for considering contributing to **BedWars1058-Deposit**! Here’s how you can help improve the project.
 
 ## Reporting Bugs
 If you find a bug, please open an issue with:
@@ -30,5 +30,5 @@ Want to suggest a new feature? Open an issue and describe:
 ## License
 By contributing, you agree that your contributions will be licensed under the same license as the project.
 
-Thank you for helping make **Bw-Deposit** better! 
+Thank you for helping make **BedWars1058-Deposit** better! 
 
