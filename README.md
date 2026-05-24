@@ -39,12 +39,15 @@
 
 # Configs
 
-This document contains the configuration details for BedWars1058-Deposit.
+This contains the configuration details for BedWars1058-Deposit.
+
+> [!NOTE]
+> All files are located in `/plugins/BedWars1058/Addons/Deposit`
+
 
 ## Main Configuration
 
 The `config.yml` file is the plugin's main configuration file:
-
 
 </div>
 
