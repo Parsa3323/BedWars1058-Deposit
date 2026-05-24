@@ -20,10 +20,7 @@
 
 </div>
 
-[//]: # (![FirstImg]&#40;https://biaupload.com/do.php?imgf=org-3b039f0f3c191.png&#41;)
 
-[//]: # ()
-[//]: # (![2Img]&#40;https://biaupload.com/do.php?imgf=org-02a4d92ff3c92.png&#41;)
 <div align="center">
 
 # Table of Content
@@ -98,8 +95,8 @@ Edit deposit messages and holograms in `messages.yml`
 </div>
 
 ```yaml
-player_deposit_chest: '&7You deposited x%amount% %color%%material% to the &bTeamChest'
-player_deposit_ender_chest: '&7You deposited x%amount% %color%%material% to the &dEnderChest'
+player_deposit_chest: '&7You deposited x%amount% %color%%material%&7 to the &bTeamChest'
+player_deposit_ender_chest: '&7You deposited x%amount% %color%%material%&7 to the &dEnderChest'
 hologram_text: |-
   &7PUNCH TO
   &7DEPOSIT.

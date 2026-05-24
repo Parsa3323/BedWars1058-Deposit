@@ -68,8 +68,8 @@ public final class DepositPlugin extends JavaPlugin {
         ArenaConfig.save();
         MessageConfig.init();
 
-        MessageConfig.get().addDefault("player_deposit_chest", "&7You deposited x%amount% %color%%material% to the &bTeamChest");
-        MessageConfig.get().addDefault("player_deposit_ender_chest", "&7You deposited x%amount% %color%%material% to the &dEnderChest");
+        MessageConfig.get().addDefault("player_deposit_chest", "&7You deposited x%amount% %color%%material%&7 to the &bTeamChest");
+        MessageConfig.get().addDefault("player_deposit_ender_chest", "&7You deposited x%amount% %color%%material%&7 to the &dEnderChest");
         MessageConfig.get().addDefault("hologram_text", "&7PUNCH TO\n&7DEPOSIT.");
 
         MessageConfig.get().options().copyDefaults(true);
