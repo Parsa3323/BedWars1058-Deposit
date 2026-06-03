@@ -20,23 +20,20 @@ package com.parsa3323.depositplugin.Listeners;
 import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerJoinListener implements Listener {
     @EventHandler
     public void playerJoinEvent(PlayerJoinEvent event) {
         if (MainConfig.get().getBoolean("set-chest-locations-on-join")) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    DepositPlugin.debug("WorldLoadEvent ran");
-                    DepositUtils.setChestLocationsAll();
-                    DepositPlugin.debug("WorldLoadEvent done");
-                }
-            }.runTaskAsynchronously(DepositPlugin.plugin);
+            Bukkit.getScheduler().runTask(DepositPlugin.plugin, () -> {
+                DepositPlugin.debug("PlayerJoinEvent: scanning chest locations");
+                DepositUtils.setChestLocationsAll();
+                DepositPlugin.debug("PlayerJoinEvent: chest location scan done");
+            });
         }
     }
 }
