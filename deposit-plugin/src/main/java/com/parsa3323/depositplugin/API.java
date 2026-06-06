@@ -20,7 +20,6 @@ package com.parsa3323.depositplugin;
 import com.parsa3323.depositapi.DepositApi;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
-import com.parsa3323.depositplugin.Listeners.GameStartListener;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import com.parsa3323.depositplugin.utils.HologramUtils;
 import org.bukkit.World;
@@ -52,12 +51,6 @@ public class API implements DepositApi {
             if (MainConfig.get().getBoolean("deposit-holograms")) {
                 HologramUtils.spawnDepositHolograms(world);
             }
-        }
-
-        @Override
-        public boolean doesHologramsWorked() {
-            GameStartListener gameStartListener = new GameStartListener();
-            return gameStartListener.successGameState && gameStartListener.successGameAssign;
         }
 
         @Override

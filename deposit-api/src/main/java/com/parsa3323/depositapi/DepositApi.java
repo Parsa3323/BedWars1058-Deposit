@@ -39,10 +39,7 @@ public interface DepositApi {
     HologramUtil getHologramUtil();
 
     interface HologramUtil {
-
         void reloadHolograms(Player player);
-
-        boolean doesHologramsWorked();
 
         void deleteHolograms(World world);
     }
