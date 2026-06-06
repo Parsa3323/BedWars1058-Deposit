@@ -21,7 +21,6 @@ import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent;
 import com.andrei1058.bedwars.api.events.gameplay.TeamAssignEvent;
-import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
@@ -29,69 +28,60 @@ import com.parsa3323.depositplugin.utils.HologramUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class GameStartListener implements Listener {
 
-    private final FileConfiguration config = ArenaConfig.get();
-    public boolean successGameAssign = false;
-    public boolean successGameState = false;
+    private final Set<String> hologramSpawnedWorlds = new HashSet<>();
+    private final Set<String> successfulAssignWorlds  = new HashSet<>();
+    private final Set<String> successfulStateWorlds   = new HashSet<>();
+    private final Set<String> fallbackScheduledWorlds = new HashSet<>();
 
-    @EventHandler
-    public void onGameStart(GameStateChangeEvent event) {
-        if (event.getNewState() != GameState.playing) return;
-
-        String configEvent = MainConfig.get().getString("hologram-register-event");
-        IArena arena = event.getArena();
+    private String resolveWorldName(IArena arena) {
         World world = arena.getWorld();
+        return world != null ? world.getName() : arena.getWorldName();
+    }
 
-        if (world == null) {
-            Bukkit.getLogger().warning("World is null for arena " + arena.getWorldName());
-            return;
-        }
-
-        if ("GameStateChangeEvent".equalsIgnoreCase(configEvent)) {
-            DepositPlugin.debug("GameStateChangeEvent triggered for world: " + world.getName());
-            successGameState = true;
-
-            DepositUtils.setChestLocations(world);
-
-            if (MainConfig.get().getBoolean("deposit-holograms")) {
-                HologramUtils.spawnDepositHolograms(world);
-            }
-
-            return;
-        }
-
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                if (!successGameAssign && MainConfig.get().getString("hologram-register-event").equalsIgnoreCase("TeamAssignEvent")) {
-                    event.getArena().getPlayers().forEach(player -> {
-                        if (player.isOp()) {
-                            player.sendMessage(ChatColor.RED + "It looks like your event for registering holograms didn't work, you can make it work with changing hologram-register-event value to GameStateChangeEvent");
-                        }
-                    });
-                }
-            }
-        }.runTaskLaterAsynchronously(DepositPlugin.plugin, 20L);
+    private void clearWorldState(String worldName) {
+        successfulAssignWorlds.remove(worldName);
+        successfulStateWorlds.remove(worldName);
+        hologramSpawnedWorlds.remove(worldName);
+        fallbackScheduledWorlds.remove(worldName);
     }
 
     @EventHandler
-    public void onGameAssign(TeamAssignEvent event) {
-        String configuredEvent = MainConfig.get().getString("hologram-register-event");
-        if ("TeamAssignEvent".equalsIgnoreCase(configuredEvent)) {
-            DepositPlugin.debug("TeamAssignEvent triggered");
-            successGameAssign = true;
+    public void onGameStateChange(GameStateChangeEvent event) {
+        IArena arena     = event.getArena();
+        GameState state  = event.getNewState();
+        String worldName = resolveWorldName(arena);
 
-            Player player = event.getPlayer();
-            World world = player.getWorld();
-            if (world == null) {
-                Bukkit.getLogger().warning("World is null for player " + player.getName());
+        if (state == GameState.restarting || state == GameState.waiting) {
+            clearWorldState(worldName);
+            return;
+        }
+
+        if (state != GameState.playing) return;
+
+        World world = arena.getWorld();
+        if (world == null) {
+            Bukkit.getLogger().warning("[DepositPlugin] World is null for arena: " + arena.getWorldName());
+            return;
+        }
+
+        String configEvent = MainConfig.get().getString("hologram-register-event");
+
+        if ("GameStateChangeEvent".equalsIgnoreCase(configEvent)) {
+            DepositPlugin.debug("GameStateChangeEvent triggered for world: " + worldName);
+            successfulStateWorlds.add(worldName);
+
+            if (!hologramSpawnedWorlds.add(worldName)) {
+                DepositPlugin.debug("Holograms already spawned for world: " + worldName);
                 return;
             }
 
@@ -104,22 +94,88 @@ public class GameStartListener implements Listener {
             return;
         }
 
+        if (!fallbackScheduledWorlds.add(worldName)) return;
 
-
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
             public void run() {
-                if (!successGameState && MainConfig.get().getString("hologram-register-event").equalsIgnoreCase("GameStateChangeEvent")) {
-                    event.getArena().getPlayers().forEach(player -> {
-                        if (player.isOp()) {
-                            player.sendMessage(ChatColor.RED + "It looks like your event for registering holograms didn't work, you can make it work with changing hologram-register-event value to TeamAssignEvent");
+                if (!successfulAssignWorlds.contains(worldName) &&
+                        "TeamAssignEvent".equalsIgnoreCase(
+                                MainConfig.get().getString("hologram-register-event"))) {
+
+                    arena.getPlayers().forEach(player -> {
+                        if (player != null && player.isOnline() && player.isOp()) {
+                            player.sendMessage(ChatColor.RED +
+                                    "Hologram registration failed. Consider switching " +
+                                    "hologram-register-event to GameStateChangeEvent.");
                         }
                     });
                 }
             }
-        }.runTaskLaterAsynchronously(DepositPlugin.plugin, 10L);
+        }.runTaskLater(DepositPlugin.plugin, 20L);
     }
 
+    @EventHandler
+    public void onTeamAssign(TeamAssignEvent event) {
+        String configuredEvent = MainConfig.get().getString("hologram-register-event");
+        boolean isTeamAssignMode = "TeamAssignEvent".equalsIgnoreCase(configuredEvent);
 
+        IArena arena = event.getArena();
+        if (arena == null) return;
 
+        String worldName = resolveWorldName(arena);
+
+        if (!isTeamAssignMode) {
+            if (!fallbackScheduledWorlds.add(worldName)) return;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!successfulStateWorlds.contains(worldName) &&
+                            "GameStateChangeEvent".equalsIgnoreCase(
+                                    MainConfig.get().getString("hologram-register-event"))) {
+
+                        arena.getPlayers().forEach(player -> {
+                            if (player != null && player.isOnline() && player.isOp()) {
+                                player.sendMessage(ChatColor.RED +
+                                        "Hologram registration failed. Consider switching " +
+                                        "hologram-register-event to TeamAssignEvent.");
+                            }
+                        });
+                    }
+                }
+            }.runTaskLater(DepositPlugin.plugin, 10L);
+
+            return;
+        }
+
+        World world = arena.getWorld();
+        if (world == null) {
+            Player player = event.getPlayer();
+            if (player != null) {
+                world = player.getWorld();
+            }
+        }
+
+        if (world == null) {
+            Bukkit.getLogger().warning("[DepositPlugin] Could not resolve world for TeamAssignEvent.");
+            return;
+        }
+
+        final World resolvedWorld = world;
+
+        DepositPlugin.debug("TeamAssignEvent triggered for world: " + worldName);
+        successfulAssignWorlds.add(worldName);
+
+        if (!hologramSpawnedWorlds.add(worldName)) {
+            DepositPlugin.debug("Holograms already spawned for world: " + worldName);
+            return;
+        }
+
+        DepositUtils.setChestLocations(resolvedWorld);
+
+        if (MainConfig.get().getBoolean("deposit-holograms")) {
+            HologramUtils.spawnDepositHolograms(resolvedWorld);
+        }
+    }
 }
