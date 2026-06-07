@@ -110,15 +110,16 @@ public class GameStartListener implements Listener {
             public void run() {
                 if (!successfulAssignWorlds.contains(worldName) &&
                         "TeamAssignEvent".equalsIgnoreCase(
-                                MainConfig.get().getString("hologram-register-event"))) {
+                                MainConfig.get().getString("hologram-register-event"))
+                        && arena.getStatus() == GameState.playing) {
 
-                    arena.getPlayers().forEach(player -> {
+                    for (Player player : arena.getPlayers()) {
                         if (player != null && player.isOnline() && player.isOp()) {
                             player.sendMessage(ChatColor.RED +
                                     "Hologram registration failed. Consider switching " +
                                     "hologram-register-event to GameStateChangeEvent.");
                         }
-                    });
+                    }
                 }
             }
         }.runTaskLater(DepositPlugin.plugin, 20L);
@@ -142,15 +143,16 @@ public class GameStartListener implements Listener {
                 public void run() {
                     if (!successfulStateWorlds.contains(worldName) &&
                             "GameStateChangeEvent".equalsIgnoreCase(
-                                    MainConfig.get().getString("hologram-register-event"))) {
+                                    MainConfig.get().getString("hologram-register-event"))
+                            && arena.getStatus() == GameState.playing) {
 
-                        arena.getPlayers().forEach(player -> {
+                        for (Player player : arena.getPlayers()) {
                             if (player != null && player.isOnline() && player.isOp()) {
                                 player.sendMessage(ChatColor.RED +
                                         "Hologram registration failed. Consider switching " +
                                         "hologram-register-event to TeamAssignEvent.");
                             }
-                        });
+                        }
                     }
                 }
             }.runTaskLater(DepositPlugin.plugin, 10L);
