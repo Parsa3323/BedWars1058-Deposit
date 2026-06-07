@@ -17,10 +17,13 @@
 
 package com.parsa3323.depositplugin.Listeners;
 
+import com.andrei1058.bedwars.api.arena.IArena;
+import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -28,12 +31,29 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class PlayerJoinListener implements Listener {
     @EventHandler
     public void playerJoinEvent(PlayerJoinEvent event) {
-        if (MainConfig.get().getBoolean("set-chest-locations-on-join")) {
-            Bukkit.getScheduler().runTask(DepositPlugin.plugin, () -> {
-                DepositPlugin.debug("PlayerJoinEvent: scanning chest locations");
-                DepositUtils.setChestLocationsAll();
-                DepositPlugin.debug("PlayerJoinEvent: chest location scan done");
-            });
+        if (!MainConfig.get().getBoolean("set-chest-locations-on-join", false)) {
+            return;
         }
+        boolean needsScan = false;
+        for (IArena arena : DepositPlugin.bedWars.getArenaUtil().getArenas()) {
+            final World world = arena.getWorld();
+            if (world == null) continue;
+            final String path = "worlds." + world.getName() + ".chestLocations";
+            if (!ArenaConfig.get().contains(path)) {
+                needsScan = true;
+                break;
+            }
+        }
+
+        if (!needsScan) {
+            DepositPlugin.debug("PlayerJoinEvent: all arena worlds already indexed — skipping scan.");
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(DepositPlugin.plugin, () -> {
+            DepositPlugin.debug("PlayerJoinEvent: unindexed arena worlds detected — scanning chest locations");
+            DepositUtils.setChestLocationsAll();
+            DepositPlugin.debug("PlayerJoinEvent: chest location scan done");
+        });
     }
 }
