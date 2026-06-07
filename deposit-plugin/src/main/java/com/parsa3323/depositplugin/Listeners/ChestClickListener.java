@@ -17,7 +17,6 @@
 
 package com.parsa3323.depositplugin.Listeners;
 
-import com.andrei1058.bedwars.api.arena.IArena;
 import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
@@ -44,7 +43,6 @@ public class ChestClickListener implements Listener {
             PlayerInteractEvent.class.getMethod("getHand");
             hasApi = true;
         } catch (Exception ignored) {
-            // 1.8 — no off-hand API available.
         }
         HAS_OFF_HAND_API = hasApi;
         HAND_SLOT = hand;
@@ -52,6 +50,7 @@ public class ChestClickListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerLeftClickChest(PlayerInteractEvent e) {
+
         if (HAS_OFF_HAND_API) {
             try {
                 Object slot = PlayerInteractEvent.class.getMethod("getHand").invoke(e);
@@ -60,6 +59,7 @@ public class ChestClickListener implements Listener {
                 return;
             }
         }
+
         if (e.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
         final Block clickedBlock = e.getClickedBlock();
@@ -69,6 +69,7 @@ public class ChestClickListener implements Listener {
         if (blockType != Material.CHEST && blockType != Material.ENDER_CHEST) return;
 
         final Player p = e.getPlayer();
+
         if (DepositPlugin.bedWars.isInSetupSession(p.getUniqueId())
                 && p.isSneaking()
                 && MainConfig.get().getBoolean("shift-click-on-chest-to-set", true)) {
@@ -77,8 +78,7 @@ public class ChestClickListener implements Listener {
             return;
         }
 
-        final IArena arena = DepositPlugin.bedWars.getArenaUtil().getArenaByPlayer(p);
-        if (arena == null || arena.getStatus() != com.andrei1058.bedwars.api.arena.GameState.playing) {
+        if (!DepositUtils.isInPlayingArena(p)) {
             return;
         }
 
@@ -87,8 +87,6 @@ public class ChestClickListener implements Listener {
             return;
         }
 
-        // Cancel before deposit so the vanilla chest-open UI never appears,
-        // even if deposit() throws mid-execution. :3
         e.setCancelled(true);
         DepositUtils.deposit(p, clickedBlock, blockType);
     }
