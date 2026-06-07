@@ -20,7 +20,9 @@ package com.parsa3323.depositplugin.Listeners;
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent;
+import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.cache.ChestOwnerCache;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -33,10 +35,15 @@ public class ArenaLifecycleListener implements Listener {
         final GameState state = event.getNewState();
 
         if (state == GameState.playing) {
-            ChestOwnerCache.populate(arena);
+            Bukkit.getScheduler().runTask(DepositPlugin.plugin, () -> {
+                if (arena.getStatus() == GameState.playing) {
+                    ChestOwnerCache.populate(arena);
+                } else {
+                    DepositPlugin.debug("ArenaLifecycleListener: arena " + arena.getWorldName()
+                            + " left PLAYING before populate tick — skipped.");
+                }
+            });
         } else {
-            // Arena is leaving the PLAYING state (RESTARTING, WAITING, DISABLED, etc.).
-            // Invalidate immediately so the next game starts with a clean cache.
             ChestOwnerCache.invalidate(arena);
         }
     }
