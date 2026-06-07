@@ -30,14 +30,17 @@ import java.util.*;
 
 public final class ChestOwnerCache {
 
+
     private ChestOwnerCache() {
         throw new UnsupportedOperationException("ChestOwnerCache is a utility class.");
     }
+    
     public enum Result {
         CACHE_MISS,
         NO_OWNER,
         OWNED
     }
+
     public static final class Lookup {
         public final Result result;
         public final ITeam team;
@@ -90,6 +93,9 @@ public final class ChestOwnerCache {
     }
 
     private static final Map<UUID, Map<BlockKey, java.util.Optional<ITeam>>> CACHE = new HashMap<>();
+
+    private static final int MAX_ENTRIES_PER_WORLD = 1024;
+
     public static Lookup lookup(Location loc) {
         final Map<BlockKey, java.util.Optional<ITeam>> worldCache = CACHE.get(loc.getWorld().getUID());
         if (worldCache == null) {
@@ -104,10 +110,18 @@ public final class ChestOwnerCache {
         final ITeam team = cached.orElse(null);
         return (team == null) ? Lookup.noOwner() : Lookup.owned(team);
     }
+
     public static void store(Location loc, ITeam team) {
-        CACHE.computeIfAbsent(loc.getWorld().getUID(), k -> new HashMap<>())
-                .put(new BlockKey(loc), java.util.Optional.ofNullable(team));
+        final Map<BlockKey, java.util.Optional<ITeam>> worldCache =
+                CACHE.computeIfAbsent(loc.getWorld().getUID(), k -> new HashMap<>());
+        if (worldCache.size() >= MAX_ENTRIES_PER_WORLD) {
+            DepositPlugin.debug("ChestOwnerCache.store: per-world cap reached for "
+                    + loc.getWorld().getName() + " — skipping lazy entry for " + new BlockKey(loc));
+            return;
+        }
+        worldCache.put(new BlockKey(loc), java.util.Optional.ofNullable(team));
     }
+
     public static void populate(IArena arena) {
         final World world = arena.getWorld();
         if (world == null) {
@@ -144,6 +158,7 @@ public final class ChestOwnerCache {
         DepositPlugin.debug("ChestOwnerCache.populate: pre-cached " + cached
                 + " chest location(s) for arena " + arena.getWorldName());
     }
+
     public static void invalidate(IArena arena) {
         final World world = arena.getWorld();
         if (world == null) return;
@@ -162,6 +177,7 @@ public final class ChestOwnerCache {
         DepositPlugin.debug("ChestOwnerCache.clear: purged " + totalEntries
                 + " entries across " + worlds + " world(s)");
     }
+
     public static ITeam computeOwner(Location blockLoc, IArena arena, double radiusSquared) {
         return arena.getTeams().stream()
                 .filter(Objects::nonNull)
