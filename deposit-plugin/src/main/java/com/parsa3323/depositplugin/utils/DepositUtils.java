@@ -19,6 +19,8 @@ package com.parsa3323.depositplugin.utils;
 
 import com.andrei1058.bedwars.api.BedWars;
 import com.andrei1058.bedwars.api.arena.IArena;
+import com.andrei1058.bedwars.api.arena.team.ITeam;
+import com.andrei1058.bedwars.api.configuration.ConfigPath;
 import com.andrei1058.bedwars.api.server.ISetupSession;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -46,20 +48,34 @@ import java.util.concurrent.ConcurrentHashMap;
  * Core utility class for the Deposit plugin //REMAKE BY 1xMohameeD. GITHUB: 1xMohameeD0101.
  * This took me 5 days to refactor don't forget the star :3
  **/
-
 public final class DepositUtils {
+
     private DepositUtils() {
         throw new UnsupportedOperationException("DepositUtils is a utility class.");
     }
 
     private static final Set<UUID> DEPOSIT_LOCK = ConcurrentHashMap.newKeySet();
-
     private static final long DEPOSIT_COOLDOWN_MS = 500L;
     private static final Map<UUID, Long> LAST_DEPOSIT_MS = new ConcurrentHashMap<>();
 
     public static void clearPlayerState(UUID uuid) {
         LAST_DEPOSIT_MS.remove(uuid);
         DEPOSIT_LOCK.remove(uuid);
+    }
+
+    public static boolean isInPlayingArena(Player player) {
+        if (player == null) return false;
+        final BedWars bw = DepositPlugin.bedWars;
+        if (bw == null) return false;
+        final IArena arena = bw.getArenaUtil().getArenaByPlayer(player);
+        return arena != null && arena.getStatus() == com.andrei1058.bedwars.api.arena.GameState.playing;
+    }
+
+    public static boolean isOnCooldown(Player player) {
+        if (player == null) return false;
+        final Long lastMs = LAST_DEPOSIT_MS.get(player.getUniqueId());
+        if (lastMs == null) return false;
+        return (System.currentTimeMillis() - lastMs) < DEPOSIT_COOLDOWN_MS;
     }
 
     private static final Set<Material> BLACKLISTED_ITEMS;
@@ -95,18 +111,18 @@ public final class DepositUtils {
     private static final EnumMap<Material, ChatColor> ITEM_COLOR_MAP = new EnumMap<>(Material.class);
 
     static {
-        mapItemColor(XMaterial.GOLD_INGOT,               ChatColor.GOLD);
-        mapItemColor(XMaterial.GOLDEN_APPLE,             ChatColor.GOLD);
-        mapItemColor(XMaterial.ENCHANTED_GOLDEN_APPLE,   ChatColor.GOLD);
+        mapItemColor(XMaterial.GOLD_INGOT,             ChatColor.GOLD);
+        mapItemColor(XMaterial.GOLDEN_APPLE,           ChatColor.GOLD);
+        mapItemColor(XMaterial.ENCHANTED_GOLDEN_APPLE, ChatColor.GOLD);
 
-        mapItemColor(XMaterial.IRON_INGOT,               ChatColor.WHITE);
+        mapItemColor(XMaterial.IRON_INGOT,             ChatColor.WHITE);
 
-        mapItemColor(XMaterial.BRICK,                    ChatColor.RED);
-        mapItemColor(XMaterial.CLAY_BALL,                ChatColor.GRAY);
+        mapItemColor(XMaterial.BRICK,                  ChatColor.RED);
+        mapItemColor(XMaterial.CLAY_BALL,              ChatColor.GRAY);
 
-        mapItemColor(XMaterial.DIAMOND,                  ChatColor.AQUA);
+        mapItemColor(XMaterial.DIAMOND,                ChatColor.AQUA);
 
-        mapItemColor(XMaterial.EMERALD,                  ChatColor.GREEN);
+        mapItemColor(XMaterial.EMERALD,                ChatColor.GREEN);
 
         DepositPlugin.debug("ITEM_COLOR_MAP built with " + ITEM_COLOR_MAP.size() + " entries.");
     }
@@ -160,6 +176,33 @@ public final class DepositUtils {
                 || BLACKLISTED_ITEMS.contains(item.getType());
     }
 
+    private static final Set<Material> TOOL_OR_WEAPON_MATERIALS;
+
+    static {
+        final EnumSet<Material> tw = EnumSet.noneOf(Material.class);
+        for (Material m : Material.values()) {
+            final String n = m.name();
+            if (n.endsWith("_SWORD") || n.endsWith("_PICKAXE") || n.endsWith("_AXE")
+                    || n.endsWith("_SHOVEL") || n.endsWith("_HOE") || n.endsWith("_BOW")
+                    || n.equals("CROSSBOW") || n.equals("TRIDENT") || n.equals("SHEARS")) {
+                tw.add(m);
+            }
+        }
+        TOOL_OR_WEAPON_MATERIALS = Collections.unmodifiableSet(tw);
+    }
+
+    private static void warnIfSuspiciousEnchantment(Player player, ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return;
+        if (TOOL_OR_WEAPON_MATERIALS.contains(item.getType())) return;
+        if (!item.hasItemMeta()) return;
+        final org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasEnchants()) return;
+        DepositPlugin.warn("Suspicious enchanted resource item detected: player="
+                + player.getName() + " item=" + item.getType().name()
+                + " enchants=" + meta.getEnchants().keySet()
+                + " — consider adding this material to the blacklist or stripping meta.");
+    }
+
     public static List<String> getArenaChests(World world) {
         DepositPlugin.debug("getArenaChests() called for world: " + world.getName());
         return ArenaConfig.get().getStringList("worlds." + world.getName() + ".chestLocations");
@@ -186,7 +229,6 @@ public final class DepositUtils {
         }
     }
 
-
     private static final Method SET_ITEM_IN_MAIN_HAND;
 
     static {
@@ -194,13 +236,10 @@ public final class DepositUtils {
         try {
             m = org.bukkit.inventory.PlayerInventory.class.getMethod("setItemInMainHand", ItemStack.class);
         } catch (NoSuchMethodException ignored) {
-            // 1.8 — method does not exist.
         }
         SET_ITEM_IN_MAIN_HAND = m;
     }
 
-
-    // deposit() — MAIN THREAD ONLY
     public static void deposit(Player player, Block block, Material blockType) {
         assertMainThread("deposit()");
 
@@ -211,11 +250,10 @@ public final class DepositUtils {
             return;
         }
         DEPOSIT_LOCK.add(uid);
-        // Released at end of current tick — never leaks even if we throw.
         Bukkit.getScheduler().runTask(DepositPlugin.plugin, () -> DEPOSIT_LOCK.remove(uid));
 
-        final long now     = System.currentTimeMillis();
-        final Long lastMs  = LAST_DEPOSIT_MS.get(uid);
+        final long now = System.currentTimeMillis();
+        final Long lastMs = LAST_DEPOSIT_MS.get(uid);
         if (lastMs != null && (now - lastMs) < DEPOSIT_COOLDOWN_MS) {
             DepositPlugin.debug("deposit() cross-tick cooldown active for " + player.getName()
                     + " (gap=" + (now - lastMs) + "ms, required=" + DEPOSIT_COOLDOWN_MS + "ms)");
@@ -223,15 +261,17 @@ public final class DepositUtils {
         }
         LAST_DEPOSIT_MS.put(uid, now);
 
-        final BedWars bw = Bukkit.getServicesManager()
-                .getRegistration(BedWars.class).getProvider();
-        if (!bw.getArenaUtil().isPlaying(player)) return;
+        final BedWars bw = DepositPlugin.bedWars;
+        if (bw == null) return;
+        final IArena arena = bw.getArenaUtil().getArenaByPlayer(player);
+        if (arena == null || arena.getStatus() != com.andrei1058.bedwars.api.arena.GameState.playing) return;
+
         DepositPlugin.debug(player.getName() + " left-clicked " + blockType.name());
 
         final ItemStack rawHeld = player.getInventory().getItemInHand();
         if (isBlacklistedItem(rawHeld)) return;
         final ItemStack heldSnapshot = rawHeld.clone();
-        final boolean    isEnderChest = blockType == Material.ENDER_CHEST;
+        final boolean isEnderChest = blockType == Material.ENDER_CHEST;
         final DepositType depositType = isEnderChest
                 ? DepositType.ENDER_CHEST
                 : DepositType.CHEST;
@@ -256,10 +296,18 @@ public final class DepositUtils {
                     + " — hand changed after event. Before=" + describeItem(heldSnapshot)
                     + " After=" + describeItem(handNow)
                     + ". Aborting deposit and resyncing inventory.");
-            player.updateInventory(); // force client inventory resync
+            player.updateInventory();
             return;
         }
+
+        warnIfSuspiciousEnchantment(player, heldSnapshot);
         final ChatColor color = resolveItemColor(heldSnapshot.getType());
+
+        if (arena.getStatus() != com.andrei1058.bedwars.api.arena.GameState.playing) {
+            DepositPlugin.debug("deposit() aborted for " + player.getName()
+                    + " — arena left PLAYING between event call and inventory write.");
+            return;
+        }
 
         if (MainConfig.get().getBoolean("deposit-whole-itemstack")) {
             depositWholeStack(player, heldSnapshot.getType(), targetInventory, depositType, color);
@@ -267,7 +315,6 @@ public final class DepositUtils {
             depositSingleStack(player, heldSnapshot, targetInventory, depositType, color);
         }
     }
-
 
     public static void depositSingleStack(
             Player player,
@@ -278,7 +325,6 @@ public final class DepositUtils {
 
         assertMainThread("depositSingleStack()");
         if (isBlacklistedItem(heldItem)) return;
-
 
         final Map<Integer, ItemStack> leftover = targetInventory.addItem(heldItem.clone());
 
@@ -296,7 +342,6 @@ public final class DepositUtils {
         if (rejected == 0) {
             clearHand(player);
         } else {
-
             final ItemStack remainder = heldItem.clone();
             remainder.setAmount(rejected);
             setHandItem(player, remainder);
@@ -309,7 +354,6 @@ public final class DepositUtils {
                 + (rejected > 0 ? " (partial; " + rejected + " returned to hand)" : ""));
     }
 
-    // depositWholeStack — MAIN THREAD ONLY
     private static void depositWholeStack(
             Player player,
             Material targetMat,
@@ -320,13 +364,13 @@ public final class DepositUtils {
         assertMainThread("depositWholeStack()");
 
         int totalDeposited = 0;
-        final int inventorySize = player.getInventory().getSize();
+        final ItemStack[] snapshot = player.getInventory().getContents();
+        final int inventorySize = snapshot.length;
 
         for (int slot = 0; slot < inventorySize; slot++) {
-
-            // Read live — never from a cached snapshot.
-            final ItemStack stack = player.getInventory().getItem(slot);
+            final ItemStack stack = snapshot[slot];
             if (stack == null || stack.getType() != targetMat) continue;
+
             final int amountBeforeAdd = stack.getAmount();
             final Map<Integer, ItemStack> leftover = targetInventory.addItem(stack.clone());
 
@@ -336,7 +380,7 @@ public final class DepositUtils {
             }
 
             final int accepted = amountBeforeAdd - rejected;
-            if (accepted <= 0) break; // chest full — player keeps everything
+            if (accepted <= 0) break;
 
             totalDeposited += accepted;
 
@@ -352,10 +396,9 @@ public final class DepositUtils {
             if (accepted >= currentAmount) {
                 player.getInventory().setItem(slot, null);
             } else {
-
                 liveSlotAfter.setAmount(currentAmount - accepted);
                 player.getInventory().setItem(slot, liveSlotAfter);
-                break; // chest is now full
+                break;
             }
         }
 
@@ -373,7 +416,7 @@ public final class DepositUtils {
         assertMainThread("handleSetupSession()");
 
         final String serialized = serializeLocation(block.getLocation());
-        final String path       = "worlds." + player.getWorld().getName() + ".chestLocations";
+        final String path = "worlds." + player.getWorld().getName() + ".chestLocations";
 
         final List<String> locations = new ArrayList<>(ArenaConfig.get().getStringList(path));
 
@@ -393,29 +436,25 @@ public final class DepositUtils {
                 XSound.BLOCK_NOTE_BLOCK_HAT.parseSound(), 1f, 1f);
 
         final String label = block.getType() == Material.ENDER_CHEST
-                ? ChatColor.DARK_PURPLE + "Ender Chest" + ChatColor.BOLD + " Deposit Set"
-                : ChatColor.AQUA        + "Team Chest"  + ChatColor.BOLD + " Deposit Set";
+                ? ChatColor.DARK_PURPLE + "Ender Chest " + ChatColor.BOLD + " Deposit Set "
+                : ChatColor.AQUA + "Team Chest " + ChatColor.BOLD + " Deposit Set ";
         HologramUtils.createCustomHologram(block.getLocation(), label);
 
         SelectionUtils.removePlayerFromSelectionMode(player);
     }
 
-    /**
-     * Sends the admin a status line showing chest count vs expected for their
-     * arena configuration.
-     */
     public static void updateSetupSessionMessage(Player player, int chestCount) {
         final ISetupSession session = DepositPlugin.bedWars.getSetupSession(player.getUniqueId());
         if (session == null) return;
 
         final int maxInTeam = session.getConfig().getInt("maxInTeam");
-        final int expected  = (maxInTeam == 1 || maxInTeam == 2) ? 16 : 8;
+        final int expected = (maxInTeam == 1 || maxInTeam == 2) ? 16 : 8;
 
         final String status;
-        if      (chestCount == 0)        status = "&c&l(NOT SET)";
-        else if (chestCount < expected)  status = "&e&l(INCOMPLETE — " + chestCount + "/" + expected + ")";
+        if (chestCount == 0) status = "&c&l(NOT SET)";
+        else if (chestCount < expected) status = "&e&l(INCOMPLETE — " + chestCount + "/" + expected + ")";
         else if (chestCount == expected) status = "&a&l(SET)";
-        else                             status = "&6&l(OVER — " + chestCount + "/" + expected + ")";
+        else status = "&6&l(OVER — " + chestCount + "/" + expected + ")";
 
         player.sendMessage(ChatColor.translateAlternateColorCodes('&',
                 "§6 ▪ §7ChestLocations: " + status + " §8- §eShift + Left-Click to register"));
@@ -427,13 +466,27 @@ public final class DepositUtils {
         DepositPlugin.debug("Scanning chest locations for all arenas...");
         int processed = 0;
 
+        boolean anyUnindexed = false;
+        for (IArena arena : DepositPlugin.bedWars.getArenaUtil().getArenas()) {
+            final World world = arena.getWorld();
+            if (world == null) continue;
+            final String path = "worlds." + world.getName() + ".chestLocations";
+            if (!ArenaConfig.get().contains(path)) {
+                anyUnindexed = true;
+                break;
+            }
+        }
+        if (!anyUnindexed) {
+            DepositPlugin.debug("setChestLocationsAll(): all arena worlds already indexed — skipping.");
+            return;
+        }
+
         for (IArena arena : DepositPlugin.bedWars.getArenaUtil().getArenas()) {
             final World world = arena.getWorld();
             if (world == null) {
                 DepositPlugin.warn("Null world for arena '" + arena.getWorldName() + "' — skipped.");
                 continue;
             }
-            // FIX: pass shouldSave=false — accumulate in memory only.
             setChestLocations(world, false);
             processed++;
         }
@@ -441,9 +494,11 @@ public final class DepositUtils {
         ArenaConfig.save();
         DepositPlugin.info("Finished scanning " + processed + " arena world(s). Saved once.");
     }
+
     public static void setChestLocations(World world) {
         setChestLocations(world, true);
     }
+
     private static void setChestLocations(World world, boolean shouldSave) {
         assertMainThread("setChestLocations()");
 
@@ -453,11 +508,9 @@ public final class DepositUtils {
             return;
         }
 
-        //a Hi from 1xMohameeD :) do you enjoy reading the code
-
         DepositPlugin.debug("Indexing chests in world: " + world.getName());
 
-        final Material chestMat      = XMaterial.CHEST.parseMaterial();
+        final Material chestMat = XMaterial.CHEST.parseMaterial();
         final Material enderChestMat = XMaterial.ENDER_CHEST.parseMaterial();
         final List<String> locations = new ArrayList<>(64);
 
@@ -493,13 +546,13 @@ public final class DepositUtils {
 
     private static boolean inventoryConsistent(ItemStack snapshot, ItemStack handNow) {
         if (handNow == null || handNow.getType() == Material.AIR) return false;
-        return snapshot.getType()   == handNow.getType()
+        return snapshot.getType() == handNow.getType()
                 && snapshot.getAmount() == handNow.getAmount();
     }
 
     private static String describeItem(ItemStack item) {
         if (item == null) return "null";
-        return item.getAmount() + "x" + item.getType().name();
+        return item.getAmount() + "x " + item.getType().name();
     }
 
     private static ChatColor resolveItemColor(Material material) {
@@ -524,8 +577,8 @@ public final class DepositUtils {
         }
 
         final String message = template
-                .replace("%amount%",   String.valueOf(amount))
-                .replace("%color%",    color.toString())
+                .replace("%amount%", String.valueOf(amount))
+                .replace("%color%", color.toString())
                 .replace("%material%", TextUtils.formatItemName(material));
 
         player.sendMessage(message);
@@ -541,7 +594,6 @@ public final class DepositUtils {
                 SET_ITEM_IN_MAIN_HAND.invoke(player.getInventory(), air);
                 return;
             } catch (Exception ignored) {
-                // Fallback on reflection failure.
             }
         }
         player.getInventory().setItemInHand(air);
@@ -554,7 +606,6 @@ public final class DepositUtils {
                 SET_ITEM_IN_MAIN_HAND.invoke(player.getInventory(), item);
                 return;
             } catch (Exception ignored) {
-                // Fallback on reflection failure.
             }
         }
         player.getInventory().setItemInHand(item);
@@ -568,12 +619,8 @@ public final class DepositUtils {
                 "THREADING VIOLATION — " + methodName + " called off main thread!");
         ex.printStackTrace(new PrintWriter(sw));
 
-        // Log first so the full stack trace reaches the console even if the
-        // caller catches the exception.
         DepositPlugin.error(sw.toString());
 
-        // Then throw  a silent log-only assert means execution continues on
-        // the wrong thread which is exactly the bug we are preventing.
         throw ex;
     }
 }
