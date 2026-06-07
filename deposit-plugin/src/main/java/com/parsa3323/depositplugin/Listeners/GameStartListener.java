@@ -33,15 +33,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class GameStartListener implements Listener {
 
     private final Set<String> hologramSpawnedWorlds = new HashSet<>();
-    private final Set<String> successfulAssignWorlds  = new HashSet<>();
-    private final Set<String> successfulStateWorlds   = new HashSet<>();
+    private final Set<String> successfulAssignWorlds = new HashSet<>();
+    private final Set<String> successfulStateWorlds = new HashSet<>();
     private final Set<String> fallbackScheduledWorlds = new HashSet<>();
+
+    public Set<String> getSuccessfulStateWorlds() {
+        return Collections.unmodifiableSet(successfulStateWorlds);
+    }
+
+    public Set<String> getSuccessfulAssignWorlds() {
+        return Collections.unmodifiableSet(successfulAssignWorlds);
+    }
 
     private String resolveWorldName(IArena arena) {
         World world = arena.getWorld();
@@ -57,8 +66,8 @@ public class GameStartListener implements Listener {
 
     @EventHandler
     public void onGameStateChange(GameStateChangeEvent event) {
-        IArena arena     = event.getArena();
-        GameState state  = event.getNewState();
+        IArena arena = event.getArena();
+        GameState state = event.getNewState();
         String worldName = resolveWorldName(arena);
 
         if (state == GameState.restarting || state == GameState.waiting) {
