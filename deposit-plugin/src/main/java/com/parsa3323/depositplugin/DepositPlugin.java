@@ -58,7 +58,7 @@ public final class DepositPlugin extends JavaPlugin {
         logger = getLogger();
 
         getLogger().info("Loading " + getDescription().getName() + " v" + getDescription().getVersion());
-        status("BedWars1058 - Deposit by Parsa3323 + Improved By 1xMohameeD & Security Patches");
+        status("BedWars1058 - Deposit v2.0.0 by Parsa3323 & 1xMohameeD | Security Patches");
 
         status("Hooking into BedWars1058...");
 
