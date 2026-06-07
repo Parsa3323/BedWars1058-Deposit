@@ -17,36 +17,68 @@
 
 package com.parsa3323.depositplugin.Listeners;
 
+import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ChestClickListener implements Listener {
 
-    @EventHandler
-    public void onPlayerLeftClickEnderChest(PlayerInteractEvent e) {
-        Player p = e.getPlayer();
-        Block clickedBlock = e.getClickedBlock();
+    private static final boolean HAS_OFF_HAND_API;
+    private static final Object HAND_SLOT;
 
-        if (clickedBlock == null || e.getAction() != Action.LEFT_CLICK_BLOCK) return;
+    static {
+        boolean hasApi = false;
+        Object hand = null;
+        try {
+            Class<?> equipmentSlotClass = Class.forName("org.bukkit.inventory.EquipmentSlot");
+            hand = equipmentSlotClass.getField("HAND").get(null);
+            PlayerInteractEvent.class.getMethod("getHand");
+            hasApi = true;
+        } catch (Exception ignored) {
+        }
+        HAS_OFF_HAND_API = hasApi;
+        HAND_SLOT = hand;
+    }
 
-        Material blockType = clickedBlock.getType();
-        if (blockType != Material.ENDER_CHEST && blockType != Material.CHEST) return;
+    
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerLeftClickChest(PlayerInteractEvent e) {
+        if (HAS_OFF_HAND_API) {
+            try {
+                Object slot = PlayerInteractEvent.class.getMethod("getHand").invoke(e);
+                if (slot != HAND_SLOT) return;
+            } catch (Exception ex) {
+                return;
+            }
+        }
+        if (e.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
-        if (DepositPlugin.bedWars.isInSetupSession(p.getUniqueId()) && p.isSneaking()) {
+        final Block clickedBlock = e.getClickedBlock();
+        if (clickedBlock == null) return;
+
+        final Material blockType = clickedBlock.getType();
+        if (blockType != Material.CHEST && blockType != Material.ENDER_CHEST) return;
+
+        final Player p = e.getPlayer();
+        if (DepositPlugin.bedWars.isInSetupSession(p.getUniqueId())
+                && p.isSneaking()
+                && MainConfig.get().getBoolean("shift-click-on-chest-to-set", true)) {
             DepositUtils.handleSetupSession(p, clickedBlock);
             e.setCancelled(true);
             return;
         }
 
-        DepositUtils.deposit(p, clickedBlock, blockType);
+        // Cancel before deposit so the vanilla chest-open UI never appears
+        // even if deposit() throws mid-execution.
         e.setCancelled(true);
+        DepositUtils.deposit(p, clickedBlock, blockType);
     }
-
 }
