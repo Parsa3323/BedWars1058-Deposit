@@ -17,6 +17,7 @@
 
 package com.parsa3323.depositplugin.Listeners;
 
+import com.andrei1058.bedwars.api.arena.IArena;
 import com.parsa3323.depositplugin.Configs.MainConfig;
 import com.parsa3323.depositplugin.DepositPlugin;
 import com.parsa3323.depositplugin.utils.DepositUtils;
@@ -43,12 +44,12 @@ public class ChestClickListener implements Listener {
             PlayerInteractEvent.class.getMethod("getHand");
             hasApi = true;
         } catch (Exception ignored) {
+            // 1.8 — no off-hand API available.
         }
         HAS_OFF_HAND_API = hasApi;
         HAND_SLOT = hand;
     }
 
-    
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerLeftClickChest(PlayerInteractEvent e) {
         if (HAS_OFF_HAND_API) {
@@ -76,8 +77,18 @@ public class ChestClickListener implements Listener {
             return;
         }
 
-        // Cancel before deposit so the vanilla chest-open UI never appears
-        // even if deposit() throws mid-execution.
+        final IArena arena = DepositPlugin.bedWars.getArenaUtil().getArenaByPlayer(p);
+        if (arena == null || arena.getStatus() != com.andrei1058.bedwars.api.arena.GameState.playing) {
+            return;
+        }
+
+        if (DepositUtils.isOnCooldown(p)) {
+            e.setCancelled(true);
+            return;
+        }
+
+        // Cancel before deposit so the vanilla chest-open UI never appears,
+        // even if deposit() throws mid-execution. :3
         e.setCancelled(true);
         DepositUtils.deposit(p, clickedBlock, blockType);
     }
