@@ -20,7 +20,6 @@ package com.parsa3323.depositplugin;
 import com.parsa3323.depositapi.DepositApi;
 import com.parsa3323.depositplugin.Configs.ArenaConfig;
 import com.parsa3323.depositplugin.Configs.MainConfig;
-import com.parsa3323.depositplugin.Listeners.GameStartListener;
 import com.parsa3323.depositplugin.utils.DepositUtils;
 import com.parsa3323.depositplugin.utils.HologramUtils;
 import org.bukkit.World;
