@@ -30,7 +30,14 @@ import java.util.List;
 
 public class API implements DepositApi {
 
-    ConfigManager configManager = new ConfigManager() {
+    private final GameStartListener gameStartListener;
+
+    public API(GameStartListener gameStartListener) {
+        this.gameStartListener = gameStartListener;
+    }
+
+    private final ConfigManager configManager = new ConfigManager() {
+
         @Override
         public List<String> getArenaChests(World arena) {
             return DepositUtils.getArenaChests(arena);
@@ -40,17 +47,32 @@ public class API implements DepositApi {
         public FileConfiguration getArenaConfig() {
             return ArenaConfig.get();
         }
-
     };
 
-    HologramUtil hologramUtil = new HologramUtil() {
+    private final HologramUtil hologramUtil = new HologramUtil() {
+
         @Override
         public void reloadHolograms(Player player) {
+            if (player == null) return;
             World world = player.getWorld();
+            HologramUtils.deleteHolograms(world);
             DepositUtils.setChestLocations(world);
             if (MainConfig.get().getBoolean("deposit-holograms")) {
                 HologramUtils.spawnDepositHolograms(world);
             }
+        }
+
+        public boolean doesHologramsWorked() {
+            String configEvent = MainConfig.get().getString(
+                    "hologram-register-event", "GameStateChangeEvent");
+
+            if ("GameStateChangeEvent".equalsIgnoreCase(configEvent)) {
+                return !gameStartListener.getSuccessfulStateWorlds().isEmpty();
+            } else if ("TeamAssignEvent".equalsIgnoreCase(configEvent)) {
+                return !gameStartListener.getSuccessfulAssignWorlds().isEmpty();
+            }
+
+            return false;
         }
 
         @Override
@@ -68,5 +90,4 @@ public class API implements DepositApi {
     public HologramUtil getHologramUtil() {
         return hologramUtil;
     }
-
 }
