@@ -123,7 +123,7 @@ hologram_text: |-
 # Contributors
 
 <a href="https://github.com/Parsa3323/BedWars1058-Deposit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Parsa3323/BedWars1058-Deposit" />
+  <img src="" />
 </a>
 
 </div>
