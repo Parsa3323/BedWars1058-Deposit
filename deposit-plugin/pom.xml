@@ -23,7 +23,7 @@
 
     <groupId>com.parsa3323</groupId>
     <artifactId>deposit-plugin</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
     <packaging>jar</packaging>
 
     <name>deposit-plugin</name>
